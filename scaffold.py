@@ -83,13 +83,13 @@ class Scaffold:
         return dedent(f"""
         apply plugin: 'com.android.application'
         apply plugin: 'kotlin-android'
+        {"apply plugin: 'kotlinx-serialization'" if not self.is_parsed else ""}
 
         ext {{
             extName = '{self.name}'
             pkgNameSuffix = '{self.package_id}'
             extClass = '.{self.className}'
             extVersionCode = 1
-            libVersion = '13'
         }}
 
         apply from: "$rootDir/common.gradle"
@@ -100,16 +100,17 @@ class Scaffold:
         return dedent(f"""
         package eu.kanade.tachiyomi.animeextension.{self.package_id}
 
-        import eu.kanade.tachiyomi.animesource.model.AnimesPage
         import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
-        import eu.kanade.tachiyomi.animesource.model.Video
+        import eu.kanade.tachiyomi.animesource.model.AnimesPage
         import eu.kanade.tachiyomi.animesource.model.SAnime
         import eu.kanade.tachiyomi.animesource.model.SEpisode
+        import eu.kanade.tachiyomi.animesource.model.Video
         import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
+        import kotlinx.serialization.json.Json
         import okhttp3.Request
         import okhttp3.Response
 
-        class {self.className}: AnimeHttpSource() {{
+        class {self.className} : AnimeHttpSource() {{
 
             override val name = "{self.name}"
 
@@ -118,6 +119,10 @@ class Scaffold:
             override val lang = "{self.lang}"
 
             override val supportsLatest = false
+
+            private val json = Json {{
+                ignoreUnknownKeys = true
+            }}
 
             // ============================== Popular ===============================
             override fun popularAnimeParse(response: Response): AnimesPage {{
@@ -168,9 +173,7 @@ class Scaffold:
             companion object {{
                 const val PREFIX_SEARCH = "id:"
             }}
-
         }}
-
         """[1:])
 
     @property
@@ -187,7 +190,7 @@ class Scaffold:
         import org.jsoup.nodes.Document
         import org.jsoup.nodes.Element
 
-        class {self.className}: ParsedAnimeHttpSource() {{
+        class {self.className} : ParsedAnimeHttpSource() {{
 
             override val name = "{self.name}"
 
