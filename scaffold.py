@@ -106,9 +106,11 @@ class Scaffold:
         import eu.kanade.tachiyomi.animesource.model.SEpisode
         import eu.kanade.tachiyomi.animesource.model.Video
         import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
+        import eu.kanade.tachiyomi.network.asObservableSuccess
         import kotlinx.serialization.json.Json
         import okhttp3.Request
         import okhttp3.Response
+        import rx.Observable
 
         class {self.className} : AnimeHttpSource() {{
 
@@ -161,6 +163,8 @@ class Scaffold:
                 TODO("Not yet implemented")
             }}
 
+{self.url_handler_search}
+
             // =============================== Latest ===============================
             override fun latestUpdatesParse(response: Response): AnimesPage {{
                 TODO("Not yet implemented")
@@ -186,9 +190,11 @@ class Scaffold:
         import eu.kanade.tachiyomi.animesource.model.SEpisode
         import eu.kanade.tachiyomi.animesource.model.Video
         import eu.kanade.tachiyomi.animesource.online.ParsedAnimeHttpSource
+        import eu.kanade.tachiyomi.network.asObservableSuccess
         import okhttp3.Request
         import org.jsoup.nodes.Document
         import org.jsoup.nodes.Element
+        import rx.Observable
 
         class {self.className} : ParsedAnimeHttpSource() {{
 
@@ -261,6 +267,8 @@ class Scaffold:
                 TODO("Not yet implemented")
             }}
 
+{self.url_handler_search}
+
             // =============================== Latest ===============================
             override fun latestUpdatesFromElement(element: Element): SAnime {{
                 TODO("Not yet implemented")
@@ -285,7 +293,7 @@ class Scaffold:
         """[1:])
 
     @property
-    def url_handler(self):
+    def url_handler(self) -> str:
         return dedent(f"""
         package eu.kanade.tachiyomi.animeextension.{self.package_id}
 
@@ -333,3 +341,25 @@ class Scaffold:
             }}
         }}
         """[1:])
+
+    @property
+    def url_handler_search(self) -> str:
+        return """
+            override fun fetchSearchAnime(page: Int, query: String, filters: AnimeFilterList): Observable<AnimesPage> {
+                return if (query.startsWith(PREFIX_SEARCH)) { // URL intent handler
+                    val id = query.removePrefix(PREFIX_SEARCH)
+                    client.newCall(GET("$baseUrl/anime/$id"))
+                        .asObservableSuccess()
+                        .map { response ->
+                            searchAnimeByIdParse(response, id)
+                        }
+                } else {
+                    super.fetchSearchAnime(page, query, filters)
+                }
+            }
+
+            private fun searchAnimeByIdParse(response: Response, id: String): AnimesPage {
+                val details = animeDetailsParse(response)
+                details.url = "/anime/$id"
+                return AnimesPage(listOf(details), false)
+            }"""[1:]
