@@ -106,6 +106,7 @@ class Scaffold:
         import eu.kanade.tachiyomi.animesource.model.SEpisode
         import eu.kanade.tachiyomi.animesource.model.Video
         import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
+        import eu.kanade.tachiyomi.network.GET
         import eu.kanade.tachiyomi.network.asObservableSuccess
         import kotlinx.serialization.json.Json
         import okhttp3.Request
@@ -186,12 +187,16 @@ class Scaffold:
         package eu.kanade.tachiyomi.animeextension.{self.package_id}
 
         import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
+        import eu.kanade.tachiyomi.animesource.model.AnimesPage
         import eu.kanade.tachiyomi.animesource.model.SAnime
         import eu.kanade.tachiyomi.animesource.model.SEpisode
         import eu.kanade.tachiyomi.animesource.model.Video
         import eu.kanade.tachiyomi.animesource.online.ParsedAnimeHttpSource
+        import eu.kanade.tachiyomi.network.GET
         import eu.kanade.tachiyomi.network.asObservableSuccess
+        import eu.kanade.tachiyomi.util.asJsoup
         import okhttp3.Request
+        import okhttp3.Response
         import org.jsoup.nodes.Document
         import org.jsoup.nodes.Element
         import rx.Observable
@@ -344,22 +349,22 @@ class Scaffold:
 
     @property
     def url_handler_search(self) -> str:
-        return """
-            override fun fetchSearchAnime(page: Int, query: String, filters: AnimeFilterList): Observable<AnimesPage> {
-                return if (query.startsWith(PREFIX_SEARCH)) { // URL intent handler
+        return f"""
+            override fun fetchSearchAnime(page: Int, query: String, filters: AnimeFilterList): Observable<AnimesPage> {{
+                return if (query.startsWith(PREFIX_SEARCH)) {{ // URL intent handler
                     val id = query.removePrefix(PREFIX_SEARCH)
                     client.newCall(GET("$baseUrl/anime/$id"))
                         .asObservableSuccess()
-                        .map { response ->
+                        .map {{ response ->
                             searchAnimeByIdParse(response, id)
-                        }
-                } else {
+                        }}
+                }} else {{
                     super.fetchSearchAnime(page, query, filters)
-                }
-            }
+                }}
+            }}
 
-            private fun searchAnimeByIdParse(response: Response, id: String): AnimesPage {
-                val details = animeDetailsParse(response)
+            private fun searchAnimeByIdParse(response: Response, id: String): AnimesPage {{
+                val details = animeDetailsParse(response{".asJsoup()" if self.is_parsed else ""})
                 details.url = "/anime/$id"
                 return AnimesPage(listOf(details), false)
-            }"""[1:]
+            }}"""[1:]
