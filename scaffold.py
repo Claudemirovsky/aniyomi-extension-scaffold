@@ -81,9 +81,11 @@ class Scaffold:
     @property
     def build_gradle(self) -> str:
         return dedent(f"""
-        apply plugin: 'com.android.application'
-        apply plugin: 'kotlin-android'
-        {"apply plugin: 'kotlinx-serialization'" if not self.is_parsed else ""}
+        plugins {{
+            alias(libs.plugins.android.application)
+            alias(libs.plugins.kotlin.android)
+            {"alias(libs.plugins.kotlin.serialization)" if not self.is_parsed else ""}
+        }}
 
         ext {{
             extName = '{self.name}'
