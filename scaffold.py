@@ -362,16 +362,13 @@ class Scaffold:
                     val id = query.removePrefix(PREFIX_SEARCH)
                     client.newCall(GET("$baseUrl/anime/$id"))
                         .asObservableSuccess()
-                        .map {{ response ->
-                            searchAnimeByIdParse(response, id)
-                        }}
+                        .map(::searchAnimeByIdParse)
                 }} else {{
                     super.fetchSearchAnime(page, query, filters)
                 }}
             }}
 
-            private fun searchAnimeByIdParse(response: Response, id: String): AnimesPage {{
+            private fun searchAnimeByIdParse(response: Response): AnimesPage {{
                 val details = animeDetailsParse(response{".asJsoup()" if self.is_parsed else ""})
-                details.url = "/anime/$id"
                 return AnimesPage(listOf(details), false)
             }}"""[1:]
