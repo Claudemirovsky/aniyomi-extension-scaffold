@@ -110,6 +110,7 @@ class Scaffold:
         import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
         import eu.kanade.tachiyomi.network.GET
         import eu.kanade.tachiyomi.network.asObservableSuccess
+        import kotlinx.serialization.decodeFromString
         import kotlinx.serialization.json.Json
         import okhttp3.Request
         import okhttp3.Response
@@ -174,6 +175,11 @@ class Scaffold:
 
             override fun latestUpdatesRequest(page: Int): Request {{
                 TODO("Not yet implemented")
+            }}
+
+            // ============================= Utilities ==============================
+            private inline fun <reified T> Response.parseAs(): T {{
+                return body.string().let(json::decodeFromString)
             }}
 
             companion object {{
