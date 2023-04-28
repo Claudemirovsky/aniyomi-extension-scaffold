@@ -131,50 +131,50 @@ class Scaffold:
 
             // ============================== Popular ===============================
             override fun popularAnimeParse(response: Response): AnimesPage {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun popularAnimeRequest(page: Int): Request {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // ============================== Episodes ==============================
             override fun episodeListParse(response: Response): List<SEpisode> {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // ============================ Video Links =============================
             override fun videoListRequest(episode: SEpisode): Request {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun videoListParse(response: Response): List<Video> {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // =========================== Anime Details ============================
             override fun animeDetailsParse(response: Response): SAnime {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // =============================== Search ===============================
             override fun searchAnimeParse(response: Response): AnimesPage {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
 {self.url_handler_search}
 
             // =============================== Latest ===============================
             override fun latestUpdatesParse(response: Response): AnimesPage {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun latestUpdatesRequest(page: Int): Request {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // ============================= Utilities ==============================
@@ -220,82 +220,82 @@ class Scaffold:
 
             // ============================== Popular ===============================
             override fun popularAnimeFromElement(element: Element): SAnime {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun popularAnimeNextPageSelector(): String? {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun popularAnimeRequest(page: Int): Request {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun popularAnimeSelector(): String {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // ============================== Episodes ==============================
             override fun episodeFromElement(element: Element): SEpisode {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun episodeListSelector(): String {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // =========================== Anime Details ============================
             override fun animeDetailsParse(document: Document): SAnime {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // ============================ Video Links =============================
             override fun videoFromElement(element: Element): Video {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun videoListSelector(): String {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun videoUrlParse(document: Document): String {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             // =============================== Search ===============================
             override fun searchAnimeFromElement(element: Element): SAnime {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun searchAnimeNextPageSelector(): String? {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun searchAnimeSelector(): String {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
 {self.url_handler_search}
 
             // =============================== Latest ===============================
             override fun latestUpdatesFromElement(element: Element): SAnime {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun latestUpdatesNextPageSelector(): String? {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun latestUpdatesRequest(page: Int): Request {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             override fun latestUpdatesSelector(): String {{
-                TODO("Not yet implemented")
+                throw UnsupportedOperationException("Not used.")
             }}
 
             companion object {{
