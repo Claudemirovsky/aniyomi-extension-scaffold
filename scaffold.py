@@ -114,6 +114,7 @@ class Scaffold:
         import okhttp3.Request
         import okhttp3.Response
         import rx.Observable
+        import uy.kohesive.injekt.injectLazy
 
         class {self.className} : AnimeHttpSource() {{
 
@@ -125,9 +126,7 @@ class Scaffold:
 
             override val supportsLatest = false
 
-            private val json = Json {{
-                ignoreUnknownKeys = true
-            }}
+            private val json: Json by injectLazy()
 
             // ============================== Popular ===============================
             override fun popularAnimeParse(response: Response): AnimesPage {{
