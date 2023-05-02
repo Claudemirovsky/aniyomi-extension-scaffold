@@ -53,8 +53,7 @@ class Scaffold:
         host = self.baseUrl.replace("https://", "", 1)
         return dedent(f"""
         <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-            package="eu.kanade.tachiyomi.animeextension">
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
             <application>
                 <activity
