@@ -284,6 +284,10 @@ class Scaffold:
             }}
 
             // ============================ Video Links =============================
+            override fun videoListParse(response: Response): List<Video> {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
             override fun videoListSelector(): String {{
                 throw UnsupportedOperationException("Not used.")
             }}
