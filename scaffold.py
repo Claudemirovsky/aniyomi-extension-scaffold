@@ -54,7 +54,6 @@ class Scaffold:
         return dedent(f"""
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
             <application>
                 <activity
                     android:name=".{self.package_id}.{self.className}UrlActivity"
@@ -129,11 +128,36 @@ class Scaffold:
             private val json: Json by injectLazy()
 
             // ============================== Popular ===============================
+            override fun popularAnimeRequest(page: Int): Request {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
             override fun popularAnimeParse(response: Response): AnimesPage {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            override fun popularAnimeRequest(page: Int): Request {{
+            // =============================== Latest ===============================
+            override fun latestUpdatesRequest(page: Int): Request {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
+            override fun latestUpdatesParse(response: Response): AnimesPage {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
+            // =============================== Search ===============================
+{self.url_handler_search}
+
+            override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
+            override fun searchAnimeParse(response: Response): AnimesPage {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
+            // =========================== Anime Details ============================
+            override fun animeDetailsParse(response: Response): SAnime {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
@@ -148,31 +172,6 @@ class Scaffold:
             }}
 
             override fun videoListParse(response: Response): List<Video> {{
-                throw UnsupportedOperationException("Not used.")
-            }}
-
-            // =========================== Anime Details ============================
-            override fun animeDetailsParse(response: Response): SAnime {{
-                throw UnsupportedOperationException("Not used.")
-            }}
-
-            // =============================== Search ===============================
-            override fun searchAnimeParse(response: Response): AnimesPage {{
-                throw UnsupportedOperationException("Not used.")
-            }}
-
-            override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {{
-                throw UnsupportedOperationException("Not used.")
-            }}
-
-{self.url_handler_search}
-
-            // =============================== Latest ===============================
-            override fun latestUpdatesParse(response: Response): AnimesPage {{
-                throw UnsupportedOperationException("Not used.")
-            }}
-
-            override fun latestUpdatesRequest(page: Int): Request {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
@@ -218,14 +217,6 @@ class Scaffold:
             override val supportsLatest = false
 
             // ============================== Popular ===============================
-            override fun popularAnimeFromElement(element: Element): SAnime {{
-                throw UnsupportedOperationException("Not used.")
-            }}
-
-            override fun popularAnimeNextPageSelector(): String? {{
-                throw UnsupportedOperationException("Not used.")
-            }}
-
             override fun popularAnimeRequest(page: Int): Request {{
                 throw UnsupportedOperationException("Not used.")
             }}
@@ -234,41 +225,33 @@ class Scaffold:
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            // ============================== Episodes ==============================
-            override fun episodeFromElement(element: Element): SEpisode {{
+            override fun popularAnimeFromElement(element: Element): SAnime {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            override fun episodeListSelector(): String {{
+            override fun popularAnimeNextPageSelector(): String? {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            // =========================== Anime Details ============================
-            override fun animeDetailsParse(document: Document): SAnime {{
+            // =============================== Latest ===============================
+            override fun latestUpdatesRequest(page: Int): Request {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            // ============================ Video Links =============================
-            override fun videoFromElement(element: Element): Video {{
+            override fun latestUpdatesSelector(): String {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            override fun videoListSelector(): String {{
+            override fun latestUpdatesFromElement(element: Element): SAnime {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            override fun videoUrlParse(document: Document): String {{
+            override fun latestUpdatesNextPageSelector(): String? {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
             // =============================== Search ===============================
-            override fun searchAnimeFromElement(element: Element): SAnime {{
-                throw UnsupportedOperationException("Not used.")
-            }}
-
-            override fun searchAnimeNextPageSelector(): String? {{
-                throw UnsupportedOperationException("Not used.")
-            }}
+{self.url_handler_search}
 
             override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {{
                 throw UnsupportedOperationException("Not used.")
@@ -278,22 +261,38 @@ class Scaffold:
                 throw UnsupportedOperationException("Not used.")
             }}
 
-{self.url_handler_search}
-
-            // =============================== Latest ===============================
-            override fun latestUpdatesFromElement(element: Element): SAnime {{
+            override fun searchAnimeFromElement(element: Element): SAnime {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            override fun latestUpdatesNextPageSelector(): String? {{
+            override fun searchAnimeNextPageSelector(): String? {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            override fun latestUpdatesRequest(page: Int): Request {{
+            // =========================== Anime Details ============================
+            override fun animeDetailsParse(document: Document): SAnime {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
-            override fun latestUpdatesSelector(): String {{
+            // ============================== Episodes ==============================
+            override fun episodeListSelector(): String {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
+            override fun episodeFromElement(element: Element): SEpisode {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
+            // ============================ Video Links =============================
+            override fun videoListSelector(): String {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
+            override fun videoFromElement(element: Element): Video {{
+                throw UnsupportedOperationException("Not used.")
+            }}
+
+            override fun videoUrlParse(document: Document): String {{
                 throw UnsupportedOperationException("Not used.")
             }}
 
@@ -321,16 +320,12 @@ class Scaffold:
          */
         class {self.className}UrlActivity : Activity() {{
 
-            private val TAG = javaClass.simpleName
+            private val tag = javaClass.simpleName
 
             override fun onCreate(savedInstanceState: Bundle?) {{
                 super.onCreate(savedInstanceState)
                 val pathSegments = intent?.data?.pathSegments
                 if (pathSegments != null && pathSegments.size > 1) {{
-                    // https://<host>/<segment 0>/<segment 1>...
-                    // ex: pattern "/anime/..*" -> pathSegments[1]
-                    // ex: pattern "/anime/info/..*" -> pathSegments[2]
-                    // etc..
                     val item = pathSegments[1]
                     val mainIntent = Intent().apply {{
                         action = "eu.kanade.tachiyomi.ANIMESEARCH"
@@ -341,10 +336,10 @@ class Scaffold:
                     try {{
                         startActivity(mainIntent)
                     }} catch (e: ActivityNotFoundException) {{
-                        Log.e(TAG, e.toString())
+                        Log.e(tag, e.toString())
                     }}
                 }} else {{
-                    Log.e(TAG, "could not parse uri from intent $intent")
+                    Log.e(tag, "could not parse uri from intent $intent")
                 }}
 
                 finish()
