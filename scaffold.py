@@ -14,7 +14,7 @@ class Scaffold:
         else:
             self.short_lang = lang
 
-        self.baseUrl = baseUrl
+        self.baseUrl = baseUrl.strip("/")
 
         self.package_path = f"src/{self.short_lang}/{self.package}"
         self.package_id = f"{self.short_lang}.{self.package}"
