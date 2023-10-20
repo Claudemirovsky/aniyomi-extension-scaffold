@@ -178,7 +178,7 @@ class Scaffold:
 
             // ============================= Utilities ==============================
             private inline fun <reified T> Response.parseAs(): T {{
-                return body.string().let(json::decodeFromString)
+                return use {{ it.body.string() }}.let(json::decodeFromString)
             }}
 
             companion object {{
@@ -368,6 +368,6 @@ class Scaffold:
             }}
 
             private fun searchAnimeByIdParse(response: Response): AnimesPage {{
-                val details = animeDetailsParse(response{".asJsoup()" if self.is_parsed else ""})
+                val details = animeDetailsParse(response{".use { it.asJsoup() }" if self.is_parsed else ""})
                 return AnimesPage(listOf(details), false)
             }}"""[1:]
