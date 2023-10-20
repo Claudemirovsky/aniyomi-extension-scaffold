@@ -90,6 +90,7 @@ class Scaffold:
             pkgNameSuffix = '{self.package_id}'
             extClass = '.{self.className}'
             extVersionCode = 1
+            libVersion = '13'
         }}
 
         apply from: "$rootDir/common.gradle"
