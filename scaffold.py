@@ -4,6 +4,10 @@ from textwrap import dedent
 class Scaffold:
     def __init__(self, is_parsed: bool, name: str, lang: str, baseUrl: str):
         self.className = "".join(filter(str.isalnum, name))  # Remove special chars
+        # Prevent (kt)lint error: "Classnames should start in uppercase!"
+        firstChar = self.className[0]
+        if firstChar.islower():
+            self.className = firstChar.upper() + self.className[1:]
         self.package = self.className.lower()
         self.is_parsed = is_parsed
         self.name = name
