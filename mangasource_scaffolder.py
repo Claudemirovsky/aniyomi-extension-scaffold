@@ -62,8 +62,8 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
         import eu.kanade.tachiyomi.source.model.SChapter
         import eu.kanade.tachiyomi.source.model.SManga
         import eu.kanade.tachiyomi.source.online.HttpSource
-        import kotlinx.serialization.decodeFromString
         import kotlinx.serialization.json.Json
+        import kotlinx.serialization.json.decodeFromStream
         import okhttp3.HttpUrl.Companion.toHttpUrl
         import okhttp3.Request
         import okhttp3.Response
@@ -93,8 +93,8 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 {self.http_source_catalogues}
 
             // ============================= Utilities ==============================
-            private inline fun <reified T> Response.parseAs(): T {{
-                return use {{ it.body.string() }}.let(json::decodeFromString)
+            private inline fun <reified T> Response.parseAs(): T = use {{
+                json.decodeFromStream(it.body.byteStream())
             }}
 
             companion object {{
