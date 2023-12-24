@@ -1,7 +1,7 @@
 import os
 from textwrap import dedent
 
-class Scaffold:
+class AnimeSourceScaffolder:
     def __init__(self, is_parsed: bool, name: str, lang: str, baseUrl: str):
         self.className = "".join(filter(str.isalnum, name))  # Remove special chars
         # Prevent (kt)lint error: "Classnames should start in uppercase!"
@@ -22,8 +22,8 @@ class Scaffold:
 
         self.package_path = f"src/{self.short_lang}/{self.package}"
         self.package_id = f"{self.short_lang}.{self.package}"
-        self.sources_path = f"{self.package_path}/src/eu/kanade/tachiyomi/animeextension/{self.short_lang}/{self.package}"
         self.resources_path = f"{self.package_path}/res"
+        self.sources_path = f"{self.package_path}/src/eu/kanade/tachiyomi/animeextension/{self.short_lang}/{self.package}"
 
     def create_dirs(self):
         try:
@@ -48,9 +48,9 @@ class Scaffold:
     @property
     def default_class(self):
         if self.is_parsed:
-            return self.parsed_anime_http_source
+            return self.parsed_http_source
         else:
-            return self.anime_http_source
+            return self.http_source
 
     @property
     def android_manifest(self) -> str:
@@ -81,14 +81,17 @@ class Scaffold:
         """[1:])
 
     @property
-    def build_gradle(self) -> str:
+    def build_gradle_plugins(self) -> str:
         return dedent(f"""
         plugins {{
             alias(libs.plugins.android.application)
             alias(libs.plugins.kotlin.android)
             {"alias(libs.plugins.kotlin.serialization)" if not self.is_parsed else ""}
-        }}
+        }}"""[1:]).replace("\n\n}", "\n}") + "\n\n"
 
+    @property
+    def build_gradle(self) -> str:
+        return self.build_gradle_plugins + dedent(f"""
         ext {{
             extName = '{self.name}'
             pkgNameSuffix = '{self.package_id}'
@@ -100,37 +103,8 @@ class Scaffold:
         """[1:])
 
     @property
-    def anime_http_source(self) -> str:
-        return dedent(f"""
-        package eu.kanade.tachiyomi.animeextension.{self.package_id}
-
-        import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
-        import eu.kanade.tachiyomi.animesource.model.AnimesPage
-        import eu.kanade.tachiyomi.animesource.model.SAnime
-        import eu.kanade.tachiyomi.animesource.model.SEpisode
-        import eu.kanade.tachiyomi.animesource.model.Video
-        import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
-        import eu.kanade.tachiyomi.network.GET
-        import eu.kanade.tachiyomi.network.asObservableSuccess
-        import kotlinx.serialization.decodeFromString
-        import kotlinx.serialization.json.Json
-        import okhttp3.Request
-        import okhttp3.Response
-        import rx.Observable
-        import uy.kohesive.injekt.injectLazy
-
-        class {self.className} : AnimeHttpSource() {{
-
-            override val name = "{self.name}"
-
-            override val baseUrl = "{self.baseUrl}"
-
-            override val lang = "{self.lang}"
-
-            override val supportsLatest = false
-
-            private val json: Json by injectLazy()
-
+    def http_source_screens(self) -> str:
+        return f"""
             // ============================== Popular ===============================
             override fun popularAnimeRequest(page: Int): Request {{
                 throw UnsupportedOperationException("Not used.")
@@ -168,16 +142,55 @@ class Scaffold:
             // ============================== Episodes ==============================
             override fun episodeListParse(response: Response): List<SEpisode> {{
                 throw UnsupportedOperationException("Not used.")
-            }}
+            }}"""[1:]
 
+    @property
+    def http_source_catalogues(self) -> str:
+        return """
             // ============================ Video Links =============================
-            override fun videoListRequest(episode: SEpisode): Request {{
+            override fun videoListRequest(episode: SEpisode): Request {
                 throw UnsupportedOperationException("Not used.")
-            }}
+            }
 
-            override fun videoListParse(response: Response): List<Video> {{
+            override fun videoListParse(response: Response): List<Video> {
                 throw UnsupportedOperationException("Not used.")
-            }}
+            }"""[1:]
+
+    @property
+    def http_source(self) -> str:
+        return dedent(f"""
+        package eu.kanade.tachiyomi.animeextension.{self.package_id}
+
+        import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
+        import eu.kanade.tachiyomi.animesource.model.AnimesPage
+        import eu.kanade.tachiyomi.animesource.model.SAnime
+        import eu.kanade.tachiyomi.animesource.model.SEpisode
+        import eu.kanade.tachiyomi.animesource.model.Video
+        import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
+        import eu.kanade.tachiyomi.network.GET
+        import eu.kanade.tachiyomi.network.asObservableSuccess
+        import kotlinx.serialization.decodeFromString
+        import kotlinx.serialization.json.Json
+        import okhttp3.Request
+        import okhttp3.Response
+        import rx.Observable
+        import uy.kohesive.injekt.injectLazy
+
+        class {self.className} : AnimeHttpSource() {{
+
+            override val name = "{self.name}"
+
+            override val baseUrl = "{self.baseUrl}"
+
+            override val lang = "{self.lang}"
+
+            override val supportsLatest = false
+
+            private val json: Json by injectLazy()
+
+{self.http_source_screens}
+
+{self.http_source_catalogues}
 
             // ============================= Utilities ==============================
             private inline fun <reified T> Response.parseAs(): T {{
@@ -191,35 +204,8 @@ class Scaffold:
         """[1:])
 
     @property
-    def parsed_anime_http_source(self) -> str:
-        return dedent(f"""
-        package eu.kanade.tachiyomi.animeextension.{self.package_id}
-
-        import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
-        import eu.kanade.tachiyomi.animesource.model.AnimesPage
-        import eu.kanade.tachiyomi.animesource.model.SAnime
-        import eu.kanade.tachiyomi.animesource.model.SEpisode
-        import eu.kanade.tachiyomi.animesource.model.Video
-        import eu.kanade.tachiyomi.animesource.online.ParsedAnimeHttpSource
-        import eu.kanade.tachiyomi.network.GET
-        import eu.kanade.tachiyomi.network.asObservableSuccess
-        import eu.kanade.tachiyomi.util.asJsoup
-        import okhttp3.Request
-        import okhttp3.Response
-        import org.jsoup.nodes.Document
-        import org.jsoup.nodes.Element
-        import rx.Observable
-
-        class {self.className} : ParsedAnimeHttpSource() {{
-
-            override val name = "{self.name}"
-
-            override val baseUrl = "{self.baseUrl}"
-
-            override val lang = "{self.lang}"
-
-            override val supportsLatest = false
-
+    def parsed_http_source_screens(self) -> str:
+        return f"""
             // ============================== Popular ===============================
             override fun popularAnimeRequest(page: Int): Request {{
                 throw UnsupportedOperationException("Not used.")
@@ -277,7 +263,7 @@ class Scaffold:
             override fun animeDetailsParse(document: Document): SAnime {{
                 throw UnsupportedOperationException("Not used.")
             }}
-
+            
             // ============================== Episodes ==============================
             override fun episodeListSelector(): String {{
                 throw UnsupportedOperationException("Not used.")
@@ -285,24 +271,61 @@ class Scaffold:
 
             override fun episodeFromElement(element: Element): SEpisode {{
                 throw UnsupportedOperationException("Not used.")
-            }}
+            }}"""[1:]
 
+    @property
+    def parsed_http_source_catalogues(self) -> str:
+        return """
             // ============================ Video Links =============================
-            override fun videoListParse(response: Response): List<Video> {{
+            override fun videoListParse(response: Response): List<Video> {
                 throw UnsupportedOperationException("Not used.")
-            }}
+            }
 
-            override fun videoListSelector(): String {{
+            override fun videoListSelector(): String {
                 throw UnsupportedOperationException("Not used.")
-            }}
+            }
 
-            override fun videoFromElement(element: Element): Video {{
+            override fun videoFromElement(element: Element): Video {
                 throw UnsupportedOperationException("Not used.")
-            }}
+            }
 
-            override fun videoUrlParse(document: Document): String {{
+            override fun videoUrlParse(document: Document): String {
                 throw UnsupportedOperationException("Not used.")
-            }}
+            }"""[1:]
+
+    @property
+    def parsed_http_source(self) -> str:
+        return dedent(f"""
+        package eu.kanade.tachiyomi.animeextension.{self.package_id}
+
+        import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
+        import eu.kanade.tachiyomi.animesource.model.AnimesPage
+        import eu.kanade.tachiyomi.animesource.model.SAnime
+        import eu.kanade.tachiyomi.animesource.model.SEpisode
+        import eu.kanade.tachiyomi.animesource.model.Video
+        import eu.kanade.tachiyomi.animesource.online.ParsedAnimeHttpSource
+        import eu.kanade.tachiyomi.network.GET
+        import eu.kanade.tachiyomi.network.asObservableSuccess
+        import eu.kanade.tachiyomi.util.asJsoup
+        import okhttp3.Request
+        import okhttp3.Response
+        import org.jsoup.nodes.Document
+        import org.jsoup.nodes.Element
+        import rx.Observable
+
+        class {self.className} : ParsedAnimeHttpSource() {{
+
+            override val name = "{self.name}"
+
+            override val baseUrl = "{self.baseUrl}"
+
+            override val lang = "{self.lang}"
+
+            override val supportsLatest = false
+
+{self.parsed_http_source_screens}
+
+{self.parsed_http_source_catalogues}
 
             companion object {{
                 const val PREFIX_SEARCH = "id:"
