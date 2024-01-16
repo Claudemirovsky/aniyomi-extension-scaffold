@@ -41,11 +41,11 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
         return """
             // =============================== Pages ================================
             override fun pageListParse(response: Response): List<Page> {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }
 
             override fun imageUrlParse(response: Response): String {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }"""[1:]
 
     @property
@@ -112,11 +112,11 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
         return """
             // =============================== Pages ================================
             override fun pageListParse(document: Document): List<Page> {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }
 
             override fun imageUrlParse(document: Document): String {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }"""[1:]
 
     @property

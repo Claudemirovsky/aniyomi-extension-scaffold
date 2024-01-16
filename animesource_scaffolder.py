@@ -107,41 +107,41 @@ class AnimeSourceScaffolder:
         return f"""
             // ============================== Popular ===============================
             override fun popularAnimeRequest(page: Int): Request {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun popularAnimeParse(response: Response): AnimesPage {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             // =============================== Latest ===============================
             override fun latestUpdatesRequest(page: Int): Request {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun latestUpdatesParse(response: Response): AnimesPage {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             // =============================== Search ===============================
 {self.url_handler_search}
 
             override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun searchAnimeParse(response: Response): AnimesPage {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             // =========================== Anime Details ============================
             override fun animeDetailsParse(response: Response): SAnime {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             // ============================== Episodes ==============================
             override fun episodeListParse(response: Response): List<SEpisode> {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}"""[1:]
 
     @property
@@ -149,11 +149,11 @@ class AnimeSourceScaffolder:
         return """
             // ============================ Video Links =============================
             override fun videoListRequest(episode: SEpisode): Request {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }
 
             override fun videoListParse(response: Response): List<Video> {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }"""[1:]
 
     @property
@@ -208,69 +208,69 @@ class AnimeSourceScaffolder:
         return f"""
             // ============================== Popular ===============================
             override fun popularAnimeRequest(page: Int): Request {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun popularAnimeSelector(): String {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun popularAnimeFromElement(element: Element): SAnime {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun popularAnimeNextPageSelector(): String? {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             // =============================== Latest ===============================
             override fun latestUpdatesRequest(page: Int): Request {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun latestUpdatesSelector(): String {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun latestUpdatesFromElement(element: Element): SAnime {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun latestUpdatesNextPageSelector(): String? {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             // =============================== Search ===============================
 {self.url_handler_search}
 
             override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun searchAnimeSelector(): String {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun searchAnimeFromElement(element: Element): SAnime {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun searchAnimeNextPageSelector(): String? {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             // =========================== Anime Details ============================
             override fun animeDetailsParse(document: Document): SAnime {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
             
             // ============================== Episodes ==============================
             override fun episodeListSelector(): String {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}
 
             override fun episodeFromElement(element: Element): SEpisode {{
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }}"""[1:]
 
     @property
@@ -278,19 +278,19 @@ class AnimeSourceScaffolder:
         return """
             // ============================ Video Links =============================
             override fun videoListParse(response: Response): List<Video> {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }
 
             override fun videoListSelector(): String {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }
 
             override fun videoFromElement(element: Element): Video {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }
 
             override fun videoUrlParse(document: Document): String {
-                throw UnsupportedOperationException("Not used.")
+                throw UnsupportedOperationException()
             }"""[1:]
 
     @property
