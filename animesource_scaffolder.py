@@ -81,20 +81,10 @@ class AnimeSourceScaffolder:
         """[1:])
 
     @property
-    def build_gradle_plugins(self) -> str:
-        return dedent(f"""
-        plugins {{
-            alias(libs.plugins.android.application)
-            alias(libs.plugins.kotlin.android)
-            {"alias(libs.plugins.kotlin.serialization)" if not self.is_parsed else ""}
-        }}"""[1:]).replace("\n\n}", "\n}") + "\n\n"
-
-    @property
     def build_gradle(self) -> str:
-        return self.build_gradle_plugins + dedent(f"""
+        return dedent(f"""
         ext {{
             extName = '{self.name}'
-            pkgNameSuffix = '{self.package_id}'
             extClass = '.{self.className}'
             extVersionCode = 1
         }}

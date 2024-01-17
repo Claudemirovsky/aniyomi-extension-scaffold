@@ -18,14 +18,6 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
     def android_manifest(self) -> str:
         return super().android_manifest.replace("/anime/", "/manga/")
 
-    @property
-    def build_gradle_plugins(self) -> str:
-        return dedent(f"""
-        apply plugin: 'com.android.application'
-        apply plugin: 'kotlin-android'
-        {"apply plugin: 'kotlinx-serialization'" if not self.is_parsed else ""}
-        """[1:]).replace("\n\n", "\n") + "\n"
-
     def convert_to_manga(self, input: str) -> str:
         output = input
         for (previous, new) in self.replace_map:
