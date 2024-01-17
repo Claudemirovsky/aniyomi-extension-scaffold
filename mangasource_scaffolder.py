@@ -166,3 +166,22 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
             .replace("/anime/", "/manga/")\
             .replace("ANIMESEARCH", "SEARCH")\
             .replace("Aniyomi", "Tachiyomi")
+
+    @property
+    def url_handler_search(self) -> str:
+        return f"""
+            override fun fetchSearchManga(page: Int, query: String, filters: FilterList): Observable<MangasPage> {{
+                return if (query.startsWith(PREFIX_SEARCH)) {{ // URL intent handler
+                    val id = query.removePrefix(PREFIX_SEARCH)
+                    client.newCall(GET("$baseUrl/manga/$id"))
+                        .asObservableSuccess()
+                        .map(::searchMangaByIdParse)
+                }} else {{
+                    super.fetchSearchManga(page, query, filters)
+                }}
+            }}
+
+            private fun searchMangaByIdParse(response: Response): MangasPage {{
+                val details = mangaDetailsParse(response{".use { it.asJsoup() }" if self.is_parsed else ""})
+                return MangasPage(listOf(details), false)
+            }}"""[1:]

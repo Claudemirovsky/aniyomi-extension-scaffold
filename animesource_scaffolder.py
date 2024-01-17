@@ -158,13 +158,9 @@ class AnimeSourceScaffolder:
         import eu.kanade.tachiyomi.animesource.model.Video
         import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
         import eu.kanade.tachiyomi.network.GET
-        import eu.kanade.tachiyomi.network.asObservableSuccess
-        import kotlinx.serialization.json.Json
-        import kotlinx.serialization.json.decodeFromStream
+        import eu.kanade.tachiyomi.network.awaitSuccess
         import okhttp3.Request
         import okhttp3.Response
-        import rx.Observable
-        import uy.kohesive.injekt.injectLazy
 
         class {self.className} : AnimeHttpSource() {{
 
@@ -176,16 +172,9 @@ class AnimeSourceScaffolder:
 
             override val supportsLatest = false
 
-            private val json: Json by injectLazy()
-
 {self.http_source_screens}
 
 {self.http_source_catalogues}
-
-            // ============================= Utilities ==============================
-            private inline fun <reified T> Response.parseAs(): T = use {{
-                json.decodeFromStream(it.body.byteStream())
-            }}
 
             companion object {{
                 const val PREFIX_SEARCH = "id:"
@@ -295,13 +284,12 @@ class AnimeSourceScaffolder:
         import eu.kanade.tachiyomi.animesource.model.Video
         import eu.kanade.tachiyomi.animesource.online.ParsedAnimeHttpSource
         import eu.kanade.tachiyomi.network.GET
-        import eu.kanade.tachiyomi.network.asObservableSuccess
+        import eu.kanade.tachiyomi.network.awaitSuccess
         import eu.kanade.tachiyomi.util.asJsoup
         import okhttp3.Request
         import okhttp3.Response
         import org.jsoup.nodes.Document
         import org.jsoup.nodes.Element
-        import rx.Observable
 
         class {self.className} : ParsedAnimeHttpSource() {{
 
@@ -372,14 +360,14 @@ class AnimeSourceScaffolder:
     @property
     def url_handler_search(self) -> str:
         return f"""
-            override fun fetchSearchAnime(page: Int, query: String, filters: AnimeFilterList): Observable<AnimesPage> {{
+            override suspend fun getSearchAnime(page: Int, query: String, filters: AnimeFilterList): AnimesPage {{
                 return if (query.startsWith(PREFIX_SEARCH)) {{ // URL intent handler
                     val id = query.removePrefix(PREFIX_SEARCH)
                     client.newCall(GET("$baseUrl/anime/$id"))
-                        .asObservableSuccess()
-                        .map(::searchAnimeByIdParse)
+                        .awaitSuccess()
+                        .use(::searchAnimeByIdParse)
                 }} else {{
-                    super.fetchSearchAnime(page, query, filters)
+                    super.getSearchAnime(page, query, filters)
                 }}
             }}
 
