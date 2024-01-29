@@ -182,6 +182,6 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
             }}
 
             private fun searchMangaByIdParse(response: Response): MangasPage {{
-                val details = mangaDetailsParse(response{".use { it.asJsoup() }" if self.is_parsed else ""})
+                val details = mangaDetailsParse(response{".asJsoup()" if self.is_parsed else ""})
                 return MangasPage(listOf(details), false)
             }}"""[1:]
