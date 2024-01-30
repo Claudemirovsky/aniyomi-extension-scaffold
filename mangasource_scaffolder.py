@@ -72,11 +72,9 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 
             override val supportsLatest = false
 
-            override val client by lazy {{
-                network.client.newBuilder()
-                    .rateLimitHost(baseUrl.toHttpUrl(), 2)
-                    .build()
-            }}
+            override val client = network.client.newBuilder()
+                .rateLimitHost(baseUrl.toHttpUrl(), 2)
+                .build()
 
             private val json: Json by injectLazy()
 
@@ -143,11 +141,9 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 
             override val supportsLatest = false
 
-            override val client by lazy {{
-                network.client.newBuilder()
-                    .rateLimitHost(baseUrl.toHttpUrl(), 2)
-                    .build()
-            }}
+            override val client = network.client.newBuilder()
+                .rateLimitHost(baseUrl.toHttpUrl(), 2)
+                .build()
 
 {self.parsed_http_source_screens}
 
