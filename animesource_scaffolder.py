@@ -1,8 +1,25 @@
-import os
+from pathlib import Path
+import re
 from textwrap import dedent
 
+
 class AnimeSourceScaffolder:
-    def __init__(self, is_parsed: bool, name: str, lang: str, baseUrl: str):
+    def __init__(
+        self,
+        is_parsed: bool,
+        name: str,
+        lang: str,
+        baseUrl: str,
+        theme: str | None = None,
+    ):
+        self.theme = theme
+        self.theme_pkg: str | None = None
+        if theme is not None:
+            if not Path("lib-multisrc").exists():
+                raise Exception(
+                    "lib-multisrc support is required in the project for scaffolding extensions with a theme."
+                )
+            self.theme_pkg = theme.lower()
         self.className = "".join(filter(str.isalnum, name))  # Remove special chars
         # Prevent (kt)lint error: "Classnames should start in uppercase!"
         firstChar = self.className[0]
@@ -22,23 +39,28 @@ class AnimeSourceScaffolder:
 
         self.package_path = f"src/{self.short_lang}/{self.package}"
         self.package_id = f"{self.short_lang}.{self.package}"
+        self.package_line = f"package eu.kanade.tachiyomi.animeextension.{self.package_id}"
         self.resources_path = f"{self.package_path}/res"
         self.sources_path = f"{self.package_path}/src/eu/kanade/tachiyomi/animeextension/{self.short_lang}/{self.package}"
 
     def create_dirs(self):
         try:
-            os.makedirs(self.sources_path)
-            os.makedirs(self.resources_path)
+            Path(self.sources_path).mkdir(parents=True)
+            Path(self.resources_path).mkdir(parents=True)
         except:
             pass
 
     def create_files(self):
         files = (
-            (f"{self.package_path}/AndroidManifest.xml", self.android_manifest),
             (f"{self.package_path}/build.gradle", self.build_gradle),
             (f"{self.sources_path}/{self.className}.kt", self.default_class),
-            (f"{self.sources_path}/{self.className}UrlActivity.kt", self.url_handler),
         )
+
+        if self.theme is None:
+            files += (
+                (f"{self.package_path}/AndroidManifest.xml", self.android_manifest),
+                (f"{self.sources_path}/{self.className}UrlActivity.kt", self.url_handler),
+            )
 
         for file, content in files:
             print(f"Creating {file}")
@@ -47,7 +69,9 @@ class AnimeSourceScaffolder:
 
     @property
     def default_class(self):
-        if self.is_parsed:
+        if self.theme is not None:
+            return self.theme_source
+        elif self.is_parsed:
             return self.parsed_http_source
         else:
             return self.http_source
@@ -86,11 +110,59 @@ class AnimeSourceScaffolder:
         ext {{
             extName = '{self.name}'
             extClass = '.{self.className}'
-            extVersionCode = 1
+            {"extVersionCode = 1" if self.theme is None else f''' themePkg = '{self.theme_pkg}'
+            baseUrl = '{self.baseUrl}'
+            overrideVersionCode = 0'''[1:]}
         }}
 
         apply from: "$rootDir/common.gradle"
         """[1:])
+
+    @property
+    def theme_source(self) -> str:
+        if self.theme is not None:
+            class_path = Path(
+                f"lib-multisrc/{self.theme_pkg}/src/eu/kanade/tachiyomi/multisrc/{self.theme_pkg}/{self.theme}.kt"
+            )
+            if not class_path.exists():
+                raise Exception(f"{self.theme} class does not exist! searched in {class_path}.")
+
+            arguments = self._get_class_arguments(class_path.read_text())
+
+            return self._theme_class(arguments)
+        else:
+            raise Exception("Wtf, that's not supposed to happen.")
+
+    def _get_class_arguments(self, class_body: str) -> str:
+        args = re.search(rf"class {self.theme}\((.*?)\) :", class_body, re.MULTILINE | re.DOTALL)
+        if args is None or not args.group(1):
+            return ""
+
+        def replace_arg(item: re.Match) -> str:
+            var_name = item.group(1)
+            match var_name:
+                # Replace known variables.
+                case "name" | "baseUrl" | "lang":
+                    return f'"{self.__getattribute__(var_name)}"'
+                # Comment-out protected/private/unknown ones.
+                case _:
+                    return "// " + item.group(0)
+
+        args_text = re.sub(
+            r"(?:final )?(?:[a-z]+)? val (\w+): \w+",
+            replace_arg,
+            args.group(1),
+        )
+        return args_text
+
+    def _theme_class(self, args: str) -> str:
+        return dedent(f"""
+        {self.package_line}
+
+        import eu.kanade.tachiyomi.multisrc.{self.theme_pkg}.{self.theme}
+
+        class {self.className} : {self.theme}
+        """[1:])[:-1] + f"({args})\n"
 
     @property
     def http_source_screens(self) -> str:
@@ -149,7 +221,7 @@ class AnimeSourceScaffolder:
     @property
     def http_source(self) -> str:
         return dedent(f"""
-        package eu.kanade.tachiyomi.animeextension.{self.package_id}
+        {self.package_line}
 
         import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
         import eu.kanade.tachiyomi.animesource.model.AnimesPage
@@ -242,7 +314,7 @@ class AnimeSourceScaffolder:
             override fun animeDetailsParse(document: Document): SAnime {{
                 throw UnsupportedOperationException()
             }}
-            
+
             // ============================== Episodes ==============================
             override fun episodeListSelector(): String {{
                 throw UnsupportedOperationException()
@@ -275,7 +347,7 @@ class AnimeSourceScaffolder:
     @property
     def parsed_http_source(self) -> str:
         return dedent(f"""
-        package eu.kanade.tachiyomi.animeextension.{self.package_id}
+        {self.package_line}
 
         import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
         import eu.kanade.tachiyomi.animesource.model.AnimesPage
@@ -314,7 +386,7 @@ class AnimeSourceScaffolder:
     @property
     def url_handler(self) -> str:
         return dedent(f"""
-        package eu.kanade.tachiyomi.animeextension.{self.package_id}
+        {self.package_line}
 
         import android.app.Activity
         import android.content.ActivityNotFoundException

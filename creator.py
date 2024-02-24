@@ -32,6 +32,7 @@ if __name__ == "__main__":
     args = argparse.ArgumentParser()
     args.add_argument("-a", "--anime", action="store_true", help="Creates a anime extension. Takes precedence over --manga.")
     args.add_argument("-m", "--manga", action="store_true", help="Creates a manga extension.")
+    args.add_argument("-t", "--theme", action="store", help="Creates a multisrc extension with the provided theme.")
     args.add_argument("-n", "--name", action="store", help="Name of the source.")
     args.add_argument("-l", "--lang", action="store", help="Language of the source.")
     args.add_argument("-b", "--base-url", action="store", help="Base URL of the source.")
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     lang = values.lang or input("Source language: ")
     baseUrl = values.base_url or input("Base URL: ")
 
-    if not (values.http_source or values.parsed_source):
+    if values.theme is None and not (values.http_source or values.parsed_source):
         is_parsed = specific_choice("""
             Choose the base class:
                 1. HttpSource / API/JSON oriented
@@ -68,7 +69,7 @@ if __name__ == "__main__":
         is_parsed = (not values.http_source) and values.parsed_source
      
 
-    args = (is_parsed, name, lang, baseUrl)
+    args = (is_parsed, name, lang, baseUrl, values.theme)
     scaffold = MangaSourceScaffolder(*args) if is_manga else AnimeSourceScaffolder(*args)
     scaffold.create_dirs()
     scaffold.create_files()

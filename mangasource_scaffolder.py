@@ -1,9 +1,18 @@
 from textwrap import dedent
 from animesource_scaffolder import AnimeSourceScaffolder
 
+
 class MangaSourceScaffolder(AnimeSourceScaffolder):
-    def __init__(self, is_parsed: bool, name: str, lang: str, baseUrl: str):
-        super().__init__(is_parsed, name, lang, baseUrl)
+    def __init__(
+        self,
+        is_parsed: bool,
+        name: str,
+        lang: str,
+        baseUrl: str,
+        theme: str | None = None,
+    ):
+        super().__init__(is_parsed, name, lang, baseUrl, theme)
+        self.package_line = "package eu.kanade.tachiyomi.extension." + self.package_id
         self.sources_path = f"{self.package_path}/src/eu/kanade/tachiyomi/extension/{self.short_lang}/{self.package}"
 
     replace_map = (
@@ -20,9 +29,28 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 
     def convert_to_manga(self, input: str) -> str:
         output = input
-        for (previous, new) in self.replace_map:
+        for previous, new in self.replace_map:
             output = output.replace(previous, new)
         return output
+
+    def _theme_class(self, args: str) -> str:
+        head = dedent(f"""
+        {self.package_line}
+
+        import eu.kanade.tachiyomi.multisrc.{self.theme_pkg}.{self.theme}
+        import eu.kanade.tachiyomi.network.interceptor.rateLimitHost
+        import okhttp3.HttpUrl.Companion.toHttpUrl
+
+        class {self.className} : {self.theme}
+        """[1:])[:-1] + f"({args}) "
+        body = dedent("""
+        {
+            override val client = network.client.newBuilder()
+                .rateLimitHost(baseUrl.toHttpUrl(), 2)
+                .build()
+        }"""[1:])
+
+        return head + body
 
     @property
     def http_source_screens(self) -> str:
@@ -43,7 +71,7 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
     @property
     def http_source(self) -> str:
         return dedent(f"""
-        package eu.kanade.tachiyomi.extension.{self.package_id}
+        {self.package_line}
 
         import eu.kanade.tachiyomi.network.GET
         import eu.kanade.tachiyomi.network.asObservableSuccess
@@ -112,7 +140,7 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
     @property
     def parsed_http_source(self) -> str:
         return dedent(f"""
-        package eu.kanade.tachiyomi.extension.{self.package_id}
+        {self.package_line}
 
         import eu.kanade.tachiyomi.network.GET
         import eu.kanade.tachiyomi.network.asObservableSuccess
@@ -157,11 +185,13 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 
     @property
     def url_handler(self) -> str:
-        return super().url_handler\
-            .replace(".tachiyomi.anime", ".tachiyomi.")\
-            .replace("/anime/", "/manga/")\
-            .replace("ANIMESEARCH", "SEARCH")\
+        return (
+            super()
+            .url_handler.replace(".tachiyomi.anime", ".tachiyomi.")
+            .replace("/anime/", "/manga/")
+            .replace("ANIMESEARCH", "SEARCH")
             .replace("Aniyomi", "Tachiyomi")
+        )
 
     @property
     def url_handler_search(self) -> str:
