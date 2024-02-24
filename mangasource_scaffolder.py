@@ -179,5 +179,6 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 
             private fun searchMangaByIdParse(response: Response): MangasPage {{
                 val details = mangaDetailsParse(response{".asJsoup()" if self.is_parsed else ""})
+                    .apply {{ setUrlWithoutDomain(response.request.url.toString()) }}
                 return MangasPage(listOf(details), false)
             }}"""[1:]

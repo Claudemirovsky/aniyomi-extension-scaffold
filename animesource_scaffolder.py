@@ -373,5 +373,6 @@ class AnimeSourceScaffolder:
 
             private fun searchAnimeByIdParse(response: Response): AnimesPage {{
                 val details = animeDetailsParse(response{".asJsoup()" if self.is_parsed else ""})
+                    .apply {{ setUrlWithoutDomain(response.request.url.toString()) }}
                 return AnimesPage(listOf(details), false)
             }}"""[1:]
