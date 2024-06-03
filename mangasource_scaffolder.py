@@ -34,7 +34,9 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
         return output
 
     def _theme_class(self, args: str) -> str:
-        head = dedent(f"""
+        head = (
+            dedent(
+                f"""
         {self.package_line}
 
         import eu.kanade.tachiyomi.multisrc.{self.theme_pkg}.{self.theme}
@@ -42,13 +44,18 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
         import okhttp3.HttpUrl.Companion.toHttpUrl
 
         class {self.className} : {self.theme}
-        """[1:])[:-1] + f"({args}) "
-        body = dedent("""
+        """[1:]
+            )[:-1]
+            + f"({args}) "
+        )
+        body = dedent(
+            """
         {
             override val client = network.client.newBuilder()
                 .rateLimitHost(baseUrl.toHttpUrl(), 2)
                 .build()
-        }"""[1:])
+        }"""[1:]
+        )
 
         return head + body
 
@@ -70,7 +77,8 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 
     @property
     def http_source(self) -> str:
-        return dedent(f"""
+        return dedent(
+            f"""
         {self.package_line}
 
         import eu.kanade.tachiyomi.network.GET
@@ -119,7 +127,8 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
                 const val PREFIX_SEARCH = "id:"
             }}
         }}
-        """[1:])
+        """[1:]
+        )
 
     @property
     def parsed_http_source_screens(self) -> str:
@@ -139,7 +148,8 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 
     @property
     def parsed_http_source(self) -> str:
-        return dedent(f"""
+        return dedent(
+            f"""
         {self.package_line}
 
         import eu.kanade.tachiyomi.network.GET
@@ -181,7 +191,8 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
                 const val PREFIX_SEARCH = "id:"
             }}
         }}
-        """[1:])
+        """[1:]
+        )
 
     @property
     def url_handler(self) -> str:
@@ -199,7 +210,7 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
             override fun fetchSearchManga(page: Int, query: String, filters: FilterList): Observable<MangasPage> {{
                 return if (query.startsWith(PREFIX_SEARCH)) {{ // URL intent handler
                     val id = query.removePrefix(PREFIX_SEARCH)
-                    client.newCall(GET("$baseUrl/manga/$id"))
+                    client.newCall(GET("$baseUrl/manga/$id", headers))
                         .asObservableSuccess()
                         .map(::searchMangaByIdParse)
                 }} else {{
@@ -209,6 +220,9 @@ class MangaSourceScaffolder(AnimeSourceScaffolder):
 
             private fun searchMangaByIdParse(response: Response): MangasPage {{
                 val details = mangaDetailsParse(response{".asJsoup()" if self.is_parsed else ""})
-                    .apply {{ setUrlWithoutDomain(response.request.url.toString()) }}
+                    .apply {{
+                        setUrlWithoutDomain(response.request.url.toString())
+                        initialized = true
+                    }}
                 return MangasPage(listOf(details), false)
             }}"""[1:]

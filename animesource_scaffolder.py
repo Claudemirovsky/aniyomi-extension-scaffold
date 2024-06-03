@@ -39,7 +39,9 @@ class AnimeSourceScaffolder:
 
         self.package_path = f"src/{self.short_lang}/{self.package}"
         self.package_id = f"{self.short_lang}.{self.package}"
-        self.package_line = f"package eu.kanade.tachiyomi.animeextension.{self.package_id}"
+        self.package_line = (
+            f"package eu.kanade.tachiyomi.animeextension.{self.package_id}"
+        )
         self.resources_path = f"{self.package_path}/res"
         self.sources_path = f"{self.package_path}/src/eu/kanade/tachiyomi/animeextension/{self.short_lang}/{self.package}"
 
@@ -59,7 +61,10 @@ class AnimeSourceScaffolder:
         if self.theme is None:
             files += (
                 (f"{self.package_path}/AndroidManifest.xml", self.android_manifest),
-                (f"{self.sources_path}/{self.className}UrlActivity.kt", self.url_handler),
+                (
+                    f"{self.sources_path}/{self.className}UrlActivity.kt",
+                    self.url_handler,
+                ),
             )
 
         for file, content in files:
@@ -79,7 +84,8 @@ class AnimeSourceScaffolder:
     @property
     def android_manifest(self) -> str:
         host = self.baseUrl.replace("https://", "", 1)
-        return dedent(f"""
+        return dedent(
+            f"""
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://schemas.android.com/apk/res/android">
             <application>
@@ -102,11 +108,13 @@ class AnimeSourceScaffolder:
                 </activity>
             </application>
         </manifest>
-        """[1:])
+        """[1:]
+        )
 
     @property
     def build_gradle(self) -> str:
-        return dedent(f"""
+        return dedent(
+            f"""
         ext {{
             extName = '{self.name}'
             extClass = '.{self.className}'
@@ -116,7 +124,8 @@ class AnimeSourceScaffolder:
         }}
 
         apply from: "$rootDir/common.gradle"
-        """[1:])
+        """[1:]
+        )
 
     @property
     def theme_source(self) -> str:
@@ -125,7 +134,9 @@ class AnimeSourceScaffolder:
                 f"lib-multisrc/{self.theme_pkg}/src/eu/kanade/tachiyomi/multisrc/{self.theme_pkg}/{self.theme}.kt"
             )
             if not class_path.exists():
-                raise Exception(f"{self.theme} class does not exist! searched in {class_path}.")
+                raise Exception(
+                    f"{self.theme} class does not exist! searched in {class_path}."
+                )
 
             arguments = self._get_class_arguments(class_path.read_text())
 
@@ -134,7 +145,9 @@ class AnimeSourceScaffolder:
             raise Exception("Wtf, that's not supposed to happen.")
 
     def _get_class_arguments(self, class_body: str) -> str:
-        args = re.search(rf"class {self.theme}\((.*?)\) :", class_body, re.MULTILINE | re.DOTALL)
+        args = re.search(
+            rf"class {self.theme}\((.*?)\) :", class_body, re.MULTILINE | re.DOTALL
+        )
         if args is None or not args.group(1):
             return ""
 
@@ -156,13 +169,18 @@ class AnimeSourceScaffolder:
         return args_text
 
     def _theme_class(self, args: str) -> str:
-        return dedent(f"""
+        return (
+            dedent(
+                f"""
         {self.package_line}
 
         import eu.kanade.tachiyomi.multisrc.{self.theme_pkg}.{self.theme}
 
         class {self.className} : {self.theme}
-        """[1:])[:-1] + f"({args})\n"
+        """[1:]
+            )[:-1]
+            + f"({args})\n"
+        )
 
     @property
     def http_source_screens(self) -> str:
@@ -220,7 +238,8 @@ class AnimeSourceScaffolder:
 
     @property
     def http_source(self) -> str:
-        return dedent(f"""
+        return dedent(
+            f"""
         {self.package_line}
 
         import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
@@ -252,7 +271,8 @@ class AnimeSourceScaffolder:
                 const val PREFIX_SEARCH = "id:"
             }}
         }}
-        """[1:])
+        """[1:]
+        )
 
     @property
     def parsed_http_source_screens(self) -> str:
@@ -346,7 +366,8 @@ class AnimeSourceScaffolder:
 
     @property
     def parsed_http_source(self) -> str:
-        return dedent(f"""
+        return dedent(
+            f"""
         {self.package_line}
 
         import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
@@ -381,11 +402,13 @@ class AnimeSourceScaffolder:
                 const val PREFIX_SEARCH = "id:"
             }}
         }}
-        """[1:])
+        """[1:]
+        )
 
     @property
     def url_handler(self) -> str:
-        return dedent(f"""
+        return dedent(
+            f"""
         {self.package_line}
 
         import android.app.Activity
@@ -427,7 +450,8 @@ class AnimeSourceScaffolder:
                 exitProcess(0)
             }}
         }}
-        """[1:])
+        """[1:]
+        )
 
     @property
     def url_handler_search(self) -> str:
@@ -435,7 +459,7 @@ class AnimeSourceScaffolder:
             override suspend fun getSearchAnime(page: Int, query: String, filters: AnimeFilterList): AnimesPage {{
                 return if (query.startsWith(PREFIX_SEARCH)) {{ // URL intent handler
                     val id = query.removePrefix(PREFIX_SEARCH)
-                    client.newCall(GET("$baseUrl/anime/$id"))
+                    client.newCall(GET("$baseUrl/anime/$id", headers))
                         .awaitSuccess()
                         .use(::searchAnimeByIdParse)
                 }} else {{
@@ -445,6 +469,9 @@ class AnimeSourceScaffolder:
 
             private fun searchAnimeByIdParse(response: Response): AnimesPage {{
                 val details = animeDetailsParse(response{".asJsoup()" if self.is_parsed else ""})
-                    .apply {{ setUrlWithoutDomain(response.request.url.toString()) }}
+                    .apply {{
+                        setUrlWithoutDomain(response.request.url.toString())
+                        initialized = true
+                    }}
                 return AnimesPage(listOf(details), false)
             }}"""[1:]
